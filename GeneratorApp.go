@@ -52,22 +52,50 @@ func main() {
 	// Serialize graph
 	graphSer, err := SerializeGraph(&graph, format)
 	handleError(err)
-	nodesSer, err := json.Marshal(nodes)
+	nodesSer, err := SerializeNodes(&nodes, format)
 	handleError(err)
 
 	// Print output to files
 	graphFile, err := os.Create(graphFileName)
 	handleError(err)
 	defer graphFile.Close()
-	_, err = graphFile.WriteString(*graphSer) // The '_' means that the return value on that possition is ignored
+	_, err = graphFile.WriteString(*graphSer) // The '_' means that the return value on that position is ignored
 	handleError(err)
 	nodesFile, err := os.Create(nodesFileName)
 	handleError(err)
 	defer nodesFile.Close()
-	_, err = nodesFile.Write(nodesSer)
+	_, err = nodesFile.WriteString(*nodesSer)
 	handleError(err)
 
 	log.Println("Successfully written to output file")
+}
+
+func SerializeNodes(nodes *[]Node, format string) (*string, error) {
+	var buff bytes.Buffer
+	switch format {
+	case JSON: {
+		s, err := json.Marshal(*nodes)
+		if err != nil {
+			return nil, err
+		}
+		buff.Write(s)
+	}; break
+	case CSV: {
+		for _, node := range *nodes {
+			buff.WriteString(strconv.Itoa(node.Id))
+			buff.WriteString(", \"")
+			buff.WriteString(node.Name)
+			buff.WriteString("\", ")
+			buff.WriteString(strconv.Itoa(node.Class))
+			buff.WriteString("\n")
+		}
+	}; break
+	default: {
+		return nil, errors.New("unknown serialization format '" + format + "'")
+	}
+	}
+	var retVal = buff.String()
+	return &retVal, nil
 }
 
 func SerializeGraph(graph *[]Edge, format string) (*string /* returning pointer enables us to return nil if desired */, error) {
