@@ -2,3 +2,5 @@
 **.iml
 /*.json
 /*.csv
+/Gopkg.lock
+/vendor/

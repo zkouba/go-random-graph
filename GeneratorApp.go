@@ -8,11 +8,13 @@ import (
 	"log"
 	"bytes"
 	"encoding/json"
+	"github.com/Pallinder/go-randomdata"
 )
 
 type Node struct {
 	Id    int
 	Class int
+	Name string
 }
 
 type Edge struct {
@@ -111,7 +113,7 @@ func GenerateRandomUndirectedGraph(
 		} else {
 			cls = 1
 		}
-		nodes[i] = Node{i, cls}
+		nodes[i] = Node{i, cls, randomdata.FullName(randomdata.RandomGender)}
 	}
 
 	var edges = make([]Edge, 0)
