@@ -10,16 +10,21 @@ import (
 	"encoding/json"
 )
 
+type Node struct {
+	Id    int
+	Class int
+}
+
 type Edge struct {
-	X int
-	Y int
+	X Node
+	Y Node
 }
 
 const JSON = "JSON"
 const CSV = "CSV"
 
 func main() {
-	if len(os.Args) < 5 {
+	if len(os.Args) < 8 {
 		err := errors.New("not enough command-line arguments")
 		handleError(err)
 	}
@@ -28,24 +33,36 @@ func main() {
 	var arguments = os.Args[1:]
 	nodeNum, err := strconv.Atoi(arguments[0])
 	handleError(err)
-	prob, err := strconv.ParseFloat(arguments[1], 64)
+	probCls, err := strconv.ParseFloat(arguments[1], 64)
 	handleError(err)
-	outputFileName := arguments[2]
-	format := arguments[3]
+	probClsInter, err := strconv.ParseFloat(arguments[2], 64)
+	handleError(err)
+	probClsIntra, err := strconv.ParseFloat(arguments[3], 64)
+	handleError(err)
+	nodesFileName := arguments[4]
+	graphFileName := arguments[5]
+	format := arguments[6]
 
 	// Generate graph
-	graph, err := GenerateRandomUndirectedGraph(nodeNum, prob)
+	nodes, graph, err := GenerateRandomUndirectedGraph(nodeNum, probCls, probClsInter, probClsIntra)
 	handleError(err)
 
 	// Serialize graph
 	graphSer, err := SerializeGraph(&graph, format)
 	handleError(err)
-
-	// Print output to file
-	outputFile, err := os.Create(outputFileName)
+	nodesSer, err := json.Marshal(nodes)
 	handleError(err)
-	defer outputFile.Close()
-	_, err = outputFile.WriteString(*graphSer) // The '_' means that the return value on that possition is ignored
+
+	// Print output to files
+	graphFile, err := os.Create(graphFileName)
+	handleError(err)
+	defer graphFile.Close()
+	_, err = graphFile.WriteString(*graphSer) // The '_' means that the return value on that possition is ignored
+	handleError(err)
+	nodesFile, err := os.Create(nodesFileName)
+	handleError(err)
+	defer nodesFile.Close()
+	_, err = nodesFile.Write(nodesSer)
 	handleError(err)
 
 	log.Println("Successfully written to output file")
@@ -63,9 +80,9 @@ func SerializeGraph(graph *[]Edge, format string) (*string /* returning pointer 
 		}; break
 		case CSV: {
 			for _, edge := range *graph {
-				buff.WriteString(strconv.Itoa(edge.X))
+				buff.WriteString(strconv.Itoa(edge.X.Id))
 				buff.WriteString(", ")
-				buff.WriteString(strconv.Itoa(edge.Y))
+				buff.WriteString(strconv.Itoa(edge.Y.Id))
 				buff.WriteString("\n")
 			}
 		}; break
@@ -77,22 +94,43 @@ func SerializeGraph(graph *[]Edge, format string) (*string /* returning pointer 
 	return &retVal, nil
 }
 
-func GenerateRandomUndirectedGraph(nodeNum int, prob float64) ([]Edge, error) {
-	if prob < 0 || prob > 1 {
-		return nil,
-			errors.New("probability that there's an edge between any two nodes has to be between 0 and 1")
+func GenerateRandomUndirectedGraph(
+	nodeNum int,
+	clsProb float64,
+	interClsProb float64,
+	intraClsProb float64) ([]Node, []Edge, error) {
+	if clsProb < 0 || clsProb > 1 || interClsProb < 0 || interClsProb > 1 || intraClsProb < 0 || intraClsProb > 1{
+		return nil, nil, errors.New("probability has to be between 0 and 1")
 	}
-	var edges = make([]Edge, 0, int(float64(nodeNum^2) * prob))
+	var nodes = make([]Node, nodeNum)
+	for i := int(0); i < nodeNum; i++ {
+		var x = rand.Float64()
+		var cls int
+		if x < clsProb {
+			cls = 0
+		} else {
+			cls = 1
+		}
+		nodes[i] = Node{i, cls}
+	}
+
+	var edges = make([]Edge, 0)
 	for n := int(0); n < nodeNum - 1; n++ {
 		for m := int(n + 1); m < nodeNum; m++ {
 			var x = rand.Float64()
+			var prob float64
+			if nodes[n].Class == nodes[m].Class {
+				prob = intraClsProb
+			} else {
+				prob = interClsProb
+			}
 			if x < prob {
-				e := Edge{n, m}
+				e := Edge{nodes[n], nodes[m]}
 				edges = append(edges, e)
 			}
 		}
 	}
-	return edges, nil
+	return nodes, edges, nil
 }
 
 func handleError(err error) {
