@@ -3,6 +3,52 @@
 Generator of random undirected graphs.
 
 ## Usage: 
+### With a config file:
+
+```bash
+go run GeneratorApp.go ${PATH_TO_CONFIG_FILE}
+```
+
+**Where:**
+
+|Parameter |Description|
+|---|---|
+|`PATH_TO_CONFIG_FILE` | Path to the text file that contains the JSON-serialization of the configuration|
+
+#### Configuration JSON structure:
+
+```json
+{
+        "OutputFormat": "CSV",
+        "NodeNumber": 1000,
+        "ProbOfClass0": 0.3,
+        "ProbOfInterClassConnection": 0.3,
+        "ProbOfIntraClassConnection": 0.8,
+        "OutputNodesFile": "nodes.csv",
+        "OutputGraphFile": "graph.csv"
+}
+```
+
+**Where:**
+
+|Parameter |Type |Description |
+|---|---|---|
+|`NodeNumber` |int | Number of nodes in the graph | 
+|`ProbOfClass0` |float64 | Probability that a node belongs to class 0 (there are only 2 classes)|
+|`ProbOfInterClassConnection` |float64 | Probability that any two nodes of different classes are connected| 
+|`ProbOfIntraClassConnection` |float64 | Probability that any two nodes of the same class are connected| 
+|`OutputNodesFile` |string | Name of the file where the list of nodes, their names and classes will be printed| 
+|`OutputGraphFile` |string | Name of the file where the list of edges will be printed| 
+|`OutputFormat` |string | The format of the output files (`JSON`, `CSV`)| 
+
+#### Example:
+
+```bash
+go run GeneratorApp.go config.json
+```
+
+### Spelling out the parameters:
+
 ```bash
 go run GeneratorApp.go \
     ${NUMBER_OF_NODES} \
@@ -26,7 +72,7 @@ go run GeneratorApp.go \
 |`GRAPH_FILE`| Name of the file where the list of edges will be printed| 
 |`FORMAT`| The format of the output files (`JSON`, `CSV`)| 
 
-### Example:
+#### Example:
 
 ```bash
 go run GeneratorApp.go \
