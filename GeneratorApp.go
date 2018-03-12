@@ -25,7 +25,7 @@ func main() {
 	handleError(err)
 
 	// Print output to files
-	edgesFile, err := os.Create(config.OutputGraphFile)
+	edgesFile, err := os.Create(config.OutputEdgesFile)
 	handleError(err)
 	defer edgesFile.Close()
 	_, err = edgesFile.WriteString(*edgesSer) // The '_' means that the return value on that position is ignored
