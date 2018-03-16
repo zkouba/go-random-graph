@@ -19,13 +19,13 @@ go run GeneratorApp.go ${PATH_TO_CONFIG_FILE}
 
 ```json
 {
-        "OutputFormat": "CSV",
-        "NodeNumber": 1000,
-        "ProbOfClass0": 0.3,
-        "ProbOfInterClassConnection": 0.3,
-        "ProbOfIntraClassConnection": 0.8,
-        "OutputNodesFile": "nodes.csv",
-        "OutputEdgesFile": "edges.csv"
+        "nodeNumber": 1000,
+        "probOfClass0": 0.3,
+        "probOfInterClassConnection": 0.3,
+        "probOfIntraClassConnection": 0.8,
+        "outputNodesFile": "nodes.csv",
+        "outputEdgesFile": "edges.csv",
+        "outputFormat": "CSV"
 }
 ```
 

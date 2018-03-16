@@ -8,13 +8,13 @@ import (
 )
 
 type Config struct {
-	NodeNumber                 int
-	ProbOfClass0               float64
-	ProbOfInterClassConnection float64
-	ProbOfIntraClassConnection float64
-	OutputNodesFile            string
-	OutputEdgesFile            string
-	OutputFormat               string
+	NodeNumber                 int     `json:"nodeNumber"`
+	ProbOfClass0               float64 `json:"probOfClass0"`
+	ProbOfInterClassConnection float64 `json:"probOfInterClassConnection"`
+	ProbOfIntraClassConnection float64 `json:"probOfIntraClassConnection"`
+	OutputNodesFile            string  `json:"outputNodesFile"`
+	OutputEdgesFile            string  `json:"outputEdgesFile"`
+	OutputFormat               string  `json:"outputFormat"`
 }
 
 func (c *Config) Load(args []string) (*Config, error) {
